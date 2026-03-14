@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: '/api' });
+const API = axios.create({ baseURL: window.location.hostname === 'localhost' ? '/api' : 'https://edu-ai.vercel.app/api' });
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('eduai_token');

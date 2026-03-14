@@ -907,7 +907,7 @@ const checkStreaks = async () => {
     }
 };
 
-setInterval(checkStreaks, 10 * 60 * 1000); // Check every 10 mins
+// setInterval(checkStreaks, 10 * 60 * 1000); // Disabled for Vercel Serverless
 
 // Manual test route
 app.post('/api/test-streak-notification', auth, async (req, res) => {
@@ -922,7 +922,4 @@ app.post('/api/test-streak-notification', auth, async (req, res) => {
     }
 });
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+module.exports = app;
