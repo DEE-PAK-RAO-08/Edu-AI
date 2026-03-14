@@ -1,0 +1,9 @@
+{
+  "name": "edu-ai-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install-all": "npm install --prefix frontend && npm install --prefix backend",
+    "build": "cd frontend && npm install && npm run build"
+  }
+}
