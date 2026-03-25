@@ -10,7 +10,8 @@ const subjects = [
   { id: 'chemistry', name: 'Chemistry', icon: '🧪', color: 'rgba(253, 203, 110, 0.15)', description: 'Organic, Inorganic, Physical, Analytical' },
   { id: 'moralscience', name: 'Moral Science', icon: '⚖️', color: 'rgba(232, 67, 147, 0.15)', description: 'Ethics, Values, Empathy, Integrity' },
   { id: 'english', name: 'English', icon: '📖', color: 'rgba(214, 48, 49, 0.15)', description: 'Grammar, Vocabulary, Reading, Writing' },
-  { id: 'tamil', name: 'Tamil', icon: '🪔', color: 'rgba(230, 126, 34, 0.15)', description: 'Grammar, Literature, Poetry, Prose' }
+  { id: 'tamil', name: 'Tamil', icon: '🪔', color: 'rgba(230, 126, 34, 0.15)', description: 'Grammar, Literature, Poetry, Prose' },
+  { id: 'ai-custom', name: 'Magic AI Quiz', icon: '✨', color: 'rgba(162, 155, 254, 0.15)', description: 'Generate a quiz on any topic you imagine instantly.' }
 ];
 
 export default function QuizSelection() {
@@ -19,7 +20,8 @@ export default function QuizSelection() {
   const [selectedSubject, setSelectedSubject] = useState(null);
 
   const startQuiz = (level) => {
-    navigate(`/test/${selectedSubject.id}?level=${level}`);
+    const topic = selectedSubject.id === 'ai-custom' ? selectedSubject.customName : selectedSubject.id;
+    navigate(`/test/${encodeURIComponent(topic)}?level=${level}`);
   };
 
   return (
@@ -82,39 +84,54 @@ export default function QuizSelection() {
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(46, 204, 113, 0.05)', border: '1px solid rgba(46, 204, 113, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('easy')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(46, 204, 113, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(46, 204, 113, 0.05)'}>
+                {selectedSubject.id === 'ai-custom' && (
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>Enter Topic</label>
+                    <input 
+                      type="text" 
+                      placeholder="e.g., Quantum Physics, World War II..." 
+                      className="form-input"
+                      value={selectedSubject.customName || ''}
+                      onChange={(e) => setSelectedSubject({...selectedSubject, customName: e.target.value})}
+                      autoFocus
+                    />
+                  </div>
+                )}
+
+                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(46, 204, 113, 0.05)', border: '1px solid rgba(46, 204, 113, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('easy')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(46, 204, 113, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(46, 204, 113, 0.05)'} disabled={selectedSubject.id === 'ai-custom' && !selectedSubject.customName}>
                   <div>
                     <strong style={{ fontSize: 18, color: '#2ecc71', display: 'block', marginBottom: 4 }}>{t('quizzes.easy')}</strong>
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('quizzes.easyDesc')}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>15 {t('quizzes.questions')}</div>
+                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>8 {t('quizzes.questions')}</div>
                     <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>15 {t('quizzes.mins')}</div>
                   </div>
                 </button>
 
-                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(241, 196, 15, 0.05)', border: '1px solid rgba(241, 196, 15, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('medium')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(241, 196, 15, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(241, 196, 15, 0.05)'}>
+                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(241, 196, 15, 0.05)', border: '1px solid rgba(241, 196, 15, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('medium')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(241, 196, 15, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(241, 196, 15, 0.05)'} disabled={selectedSubject.id === 'ai-custom' && !selectedSubject.customName}>
                   <div>
                     <strong style={{ fontSize: 18, color: '#f1c40f', display: 'block', marginBottom: 4 }}>{t('quizzes.medium')}</strong>
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('quizzes.mediumDesc')}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>30 {t('quizzes.questions')}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>40 {t('quizzes.mins')}</div>
+                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>10 {t('quizzes.questions')}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>20 {t('quizzes.mins')}</div>
                   </div>
                 </button>
 
-                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(231, 76, 60, 0.05)', border: '1px solid rgba(231, 76, 60, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('hard')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.05)'}>
+                <button className="difficulty-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px', background: 'rgba(231, 76, 60, 0.05)', border: '1px solid rgba(231, 76, 60, 0.2)', borderRadius: '16px', cursor: 'pointer', transition: 'all 0.2s', textAlign: 'left' }} onClick={() => startQuiz('hard')} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.1)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(231, 76, 60, 0.05)'} disabled={selectedSubject.id === 'ai-custom' && !selectedSubject.customName}>
                   <div>
                     <strong style={{ fontSize: 18, color: '#e74c3c', display: 'block', marginBottom: 4 }}>{t('quizzes.hard')}</strong>
                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{t('quizzes.hardDesc')}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>50 {t('quizzes.questions')}</div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>60 {t('quizzes.mins')}</div>
+                    <div style={{ color: 'var(--text-primary)', fontWeight: 600, fontSize: 15 }}>12 {t('quizzes.questions')}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>30 {t('quizzes.mins')}</div>
                   </div>
                 </button>
               </div>
+
             </motion.div>
           </motion.div>
         )}

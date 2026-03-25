@@ -17,7 +17,7 @@ export default function LandingPage() {
         >
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 32 }}>
             <div className="logo-container" style={{ width: 140, height: 105, borderRadius: 16 }}>
-              <img src="/BRAND_ICON_TRANSPARENT.png" alt="EduAI Logo" className="logo-animated" style={{ animation: 'none' }} />
+              <img src="/favicon_final.png" alt="EduAI Logo" className="logo-animated" style={{ animation: 'none' }} />
             </div>
           </div>
           <div className="hero-badge">

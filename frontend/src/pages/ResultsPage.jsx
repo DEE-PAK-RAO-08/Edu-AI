@@ -58,6 +58,56 @@ export default function ResultsPage() {
         </div>
       </motion.div>
 
+      {/* AI Analysis */}
+      {results.aiAnalysis && (
+        <motion.div 
+          className="card animate-fade-in" 
+          style={{ marginBottom: 24, padding: 32, border: '1px solid var(--accent-primary)', position: 'relative', overflow: 'hidden' }}
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          <div style={{ position: 'absolute', top: 0, right: 0, padding: '8px 16px', background: 'var(--accent-primary)', color: '#fff', fontSize: 12, fontWeight: 700, borderRadius: '0 0 0 12px' }}>
+            ✨ AI ANALYST
+          </div>
+          
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', marginBottom: 20 }}>
+            <div style={{ fontSize: 32 }}>🧠</div>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700 }}>Intelligent Performance Report</h3>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
+                <span className={`badge ${results.aiAnalysis.status === 'Exceptional' ? 'badge-success' : results.aiAnalysis.status === 'Steady' ? 'badge-primary' : 'badge-danger'}`} style={{ fontSize: 10 }}>
+                  {results.aiAnalysis.status}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <p style={{ fontSize: 16, lineHeight: 1.6, color: 'var(--text-primary)', marginBottom: 24, fontStyle: 'italic' }}>
+            "{results.aiAnalysis.summary}"
+          </p>
+
+          <div className="grid-2" style={{ gap: 24 }}>
+            <div>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-primary-light)', marginBottom: 12, textTransform: 'uppercase' }}>🔍 Behavioral Insights</h4>
+              <ul style={{ paddingLeft: 20, margin: 0, fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                {results.aiAnalysis.insights.map((insight, i) => (
+                  <li key={i} style={{ marginBottom: 8 }}>{insight}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent-success)', marginBottom: 12, textTransform: 'uppercase' }}>🚀 Next Steps</h4>
+              <ul style={{ paddingLeft: 20, margin: 0, fontSize: 14, lineHeight: 1.6, color: 'var(--text-secondary)' }}>
+                {results.aiAnalysis.recommendations.map((rec, i) => (
+                  <li key={i} style={{ marginBottom: 8 }}>{rec}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Topic Analysis */}
       <div className="grid-2" style={{ marginBottom: 24 }}>
         <div className="card">

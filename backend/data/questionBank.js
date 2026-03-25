@@ -88,6 +88,54 @@ const questionBank = {
       { id: 'c_n_4', question: 'DNS converts:', options: ['IP to MAC', 'Domain to IP', 'IP to Domain', 'MAC to IP'], answer: 'Domain to IP', difficulty: 2, topic: 'networking' },
       { id: 'c_n_5', question: 'TCP is a __ protocol:', options: ['Connectionless', 'Connection-oriented', 'Stateless', 'Wireless'], answer: 'Connection-oriented', difficulty: 2, topic: 'networking' },
     ]
+  },
+  chemistry: {
+    general: [
+      { id: 'ch_g_1', question: 'What is the chemical symbol for Gold?', options: ['Gd', 'Go', 'Au', 'Ag'], answer: 'Au', difficulty: 1, topic: 'general' },
+      { id: 'ch_g_2', question: 'Which gas is most abundant in Earth\'s atmosphere?', options: ['Oxygen', 'Carbon Dioxide', 'Nitrogen', 'Argon'], answer: 'Nitrogen', difficulty: 1, topic: 'general' },
+      { id: 'ch_g_3', question: 'What is the pH of pure water?', options: ['0', '5', '7', '14'], answer: '7', difficulty: 1, topic: 'general' },
+      { id: 'ch_g_4', question: 'Which element is known as the "King of Chemicals"?', options: ['Sulfuric Acid', 'Oxygen', 'Hydrogen', 'Carbon'], answer: 'Sulfuric Acid', difficulty: 2, topic: 'general' },
+      { id: 'ch_g_5', question: 'What is the chemical formula for common salt?', options: ['NaCl', 'KCl', 'MgCl₂', 'LiCl'], answer: 'NaCl', difficulty: 1, topic: 'general' },
+    ]
+  },
+  moralscience: {
+    ethics: [
+      { id: 'ms_e_1', question: 'What is the meaning of "Integrity"?', options: ['Being rich', 'Being honest and having strong moral principles', 'Being clever', 'Being famous'], answer: 'Being honest and having strong moral principles', difficulty: 1, topic: 'ethics' },
+      { id: 'ms_e_2', question: 'Why is empathy important?', options: ['To win arguments', 'To understand and share the feelings of others', 'To get more marks', 'To ignore others'], answer: 'To understand and share the feelings of others', difficulty: 1, topic: 'ethics' },
+      { id: 'ms_e_3', question: 'Helping someone in need is an example of:', options: ['Selfishness', 'Altruism', 'Greed', 'Laziness'], answer: 'Altruism', difficulty: 1, topic: 'ethics' },
+      { id: 'ms_e_4', question: 'What does "Respect" mean?', options: ['Ignoring elders', 'Valuing others and treating them with care', 'Shouting at friends', 'Taking things without asking'], answer: 'Valuing others and treating them with care', difficulty: 1, topic: 'ethics' },
+      { id: 'ms_e_5', question: 'Which of these is a core value?', options: ['Dishonesty', 'Patience', 'Hatred', 'Jealousy'], answer: 'Patience', difficulty: 1, topic: 'ethics' },
+    ]
+  },
+  english: {
+    grammar: [
+      { id: 'en_g_1', question: 'Which of these is a noun?', options: ['Run', 'Beautiful', 'Apple', 'Quickly'], answer: 'Apple', difficulty: 1, topic: 'grammar' },
+      { id: 'en_g_2', question: 'Identify the conjunction: "I like tea and coffee."', options: ['I', 'Like', 'And', 'Tea'], answer: 'And', difficulty: 1, topic: 'grammar' },
+      { id: 'en_g_3', question: 'What is the synonym of "Happy"?', options: ['Sad', 'Angry', 'Joyful', 'Tired'], answer: 'Joyful', difficulty: 1, topic: 'grammar' },
+      { id: 'en_g_4', question: 'Choose the correct preposition: "The book is ___ the table."', options: ['In', 'On', 'Under', 'By'], answer: 'On', difficulty: 1, topic: 'grammar' },
+      { id: 'en_g_5', question: 'Identify the adjective: "The blue sky is clear."', options: ['Sky', 'Blue', 'Clear', 'Both Blue and Clear'], answer: 'Both Blue and Clear', difficulty: 1, topic: 'grammar' },
+    ]
+  },
+  history: {
+    world: [
+      { id: 'hi_w_1', question: 'Who was the first President of the United States?', options: ['Thomas Jefferson', 'Abraham Lincoln', 'George Washington', 'John Adams'], answer: 'George Washington', difficulty: 1, topic: 'world' },
+      { id: 'hi_w_2', question: 'The French Revolution began in which year?', options: ['1776', '1789', '1804', '1812'], answer: '1789', difficulty: 2, topic: 'world' },
+      { id: 'hi_w_3', question: 'Who discovered America in 1492?', options: ['Vasco da Gama', 'Christopher Columbus', 'Magellan', 'Marco Polo'], answer: 'Christopher Columbus', difficulty: 1, topic: 'world' },
+    ]
+  },
+  geography: {
+    world: [
+      { id: 'ge_w_1', question: 'Which is the largest continent?', options: ['Africa', 'Europe', 'Asia', 'North America'], answer: 'Asia', difficulty: 1, topic: 'world' },
+      { id: 'ge_w_2', question: 'Which is the longest river in the world?', options: ['Amazon', 'Nile', 'Ganga', 'Mississippi'], answer: 'Nile', difficulty: 1, topic: 'world' },
+      { id: 'ge_w_3', question: 'What is the capital of France?', options: ['Berlin', 'Madrid', 'Paris', 'Rome'], answer: 'Paris', difficulty: 1, topic: 'world' },
+    ]
+  },
+  tamil: {
+    literature: [
+      { id: 'ta_l_1', question: 'Who wrote "Thirukkural"?', options: ['Kambar', 'Thiruvalluvar', 'Bharathiyar', 'Avvaiyar'], answer: 'Thiruvalluvar', difficulty: 1, topic: 'literature' },
+      { id: 'ta_l_2', question: 'How many chapters are in Thirukkural?', options: ['100', '133', '150', '200'], answer: '133', difficulty: 1, topic: 'literature' },
+      { id: 'ta_l_3', question: 'What is the ancient Tamil grammar book?', options: ['Silappathikaram', 'Manimekalai', 'Tolkappiyam', 'Ettuthogai'], answer: 'Tolkappiyam', difficulty: 2, topic: 'literature' },
+    ]
   }
 };
 
@@ -173,12 +221,14 @@ const learningPaths = {
 };
 
 function getTestQuestions(subject, count = 12) {
-  const subjectQuestions = questionBank[subject] || questionBank['mathematics']; // fallback for new subjects
+  const subjectQuestions = questionBank[subject];
   
   const allQuestions = [];
-  Object.values(subjectQuestions).forEach(topicQuestions => {
-    allQuestions.push(...topicQuestions);
-  });
+  if (subjectQuestions) {
+    Object.values(subjectQuestions).forEach(topicQuestions => {
+      allQuestions.push(...topicQuestions);
+    });
+  }
   
   if (allQuestions.length === 0) return [];
 

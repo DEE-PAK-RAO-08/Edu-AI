@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: eduai_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: eduai_backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongodb:27017/edu_ai
+      - JWT_SECRET=YOUR_SECRET_KEY
+      - GEMINI_API_KEY=YOUR_GEMINI_KEY
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongodb
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: eduai_frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  mongodb_data:

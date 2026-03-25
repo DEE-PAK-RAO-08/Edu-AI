@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
@@ -19,6 +20,13 @@ import AnalyticsPage from './pages/AnalyticsPage';
 import ProfilePage from './pages/ProfilePage';
 import CoursesPage from './pages/CoursesPage';
 import LearningStyleQuiz from './pages/LearningStyleQuiz';
+// New Pages
+import AIChatPage from './pages/AIChatPage';
+import StudyPlannerPage from './pages/StudyPlannerPage';
+import FlashcardsPage from './pages/FlashcardsPage';
+import CodePlaygroundPage from './pages/CodePlaygroundPage';
+import DiscussionPage from './pages/DiscussionPage';
+import CertificatePage from './pages/CertificatePage';
 import './index.css';
 
 function PrivateRoute({ children }) {
@@ -36,38 +44,47 @@ function PublicRoute({ children }) {
 function App() {
   return (
     <BrowserRouter>
-      <LanguageProvider>
-        <AuthProvider>
-          <Routes>
-            {/* App entry point */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-            <Route path="/welcome" element={<LandingPage />} />
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <Routes>
+              {/* App entry point */}
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+              <Route path="/welcome" element={<LandingPage />} />
 
-            {/* Protected routes with sidebar layout */}
-            <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/quizzes" element={<QuizSelection />} />
-              <Route path="/test/:subject" element={<TestPage />} />
-              <Route path="/results" element={<ResultsPage />} />
-              <Route path="/learning/:subject" element={<LearningPathPage />} />
-              <Route path="/games" element={<GamesPage />} />
-              <Route path="/simulations" element={<SimulationsPage />} />
-              <Route path="/challenge/:subject" element={<ChallengePage />} />
-              <Route path="/leaderboard" element={<LeaderboardPage />} />
-              <Route path="/xp-rewards" element={<XPRewardsPage />} />
-              <Route path="/analytics" element={<AnalyticsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/courses" element={<CoursesPage />} />
-              <Route path="/learning-style" element={<LearningStyleQuiz />} />
-            </Route>
+              {/* Protected routes with sidebar layout */}
+              <Route element={<PrivateRoute><Layout /></PrivateRoute>}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/quizzes" element={<QuizSelection />} />
+                <Route path="/test/:subject" element={<TestPage />} />
+                <Route path="/results" element={<ResultsPage />} />
+                <Route path="/learning/:subject" element={<LearningPathPage />} />
+                <Route path="/games" element={<GamesPage />} />
+                <Route path="/simulations" element={<SimulationsPage />} />
+                <Route path="/challenge/:subject" element={<ChallengePage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/xp-rewards" element={<XPRewardsPage />} />
+                <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/courses" element={<CoursesPage />} />
+                <Route path="/learning-style" element={<LearningStyleQuiz />} />
+                {/* New Routes */}
+                <Route path="/ai-tutor" element={<AIChatPage />} />
+                <Route path="/study-planner" element={<StudyPlannerPage />} />
+                <Route path="/flashcards" element={<FlashcardsPage />} />
+                <Route path="/code-playground" element={<CodePlaygroundPage />} />
+                <Route path="/discussions" element={<DiscussionPage />} />
+                <Route path="/certificates" element={<CertificatePage />} />
+              </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </AuthProvider>
-      </LanguageProvider>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

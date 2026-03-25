@@ -1,21 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useTheme } from '../context/ThemeContext';
+import { requestFCMToken } from '../firebase';
+import API from '../api';
 
 export default function Layout() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  useEffect(() => {
+    // Request push notification permission and register token if user is logged in
+    if (user) {
+      requestFCMToken().then(token => {
+        if (token) {
+          API.post('/notifications/register-device', { fcmToken: token }).catch(console.error);
+        }
+      });
+    }
+  }, [user]);
+
   const navItems = [
     { path: '/dashboard', icon: '🏠', label: t('nav.dashboard') },
+    { path: '/ai-tutor', icon: '🤖', label: 'AI Tutor' },
     { path: '/quizzes', icon: '📝', label: t('nav.quizzes') },
     { path: '/courses', icon: '📓', label: t('nav.courses') },
+    { path: '/flashcards', icon: '🃏', label: 'Flashcards' },
+    { path: '/study-planner', icon: '📅', label: 'Study Planner' },
+    { path: '/code-playground', icon: '💻', label: 'Code Lab' },
     { path: '/games', icon: '🎮', label: t('nav.games') },
     { path: '/simulations', icon: '🔬', label: t('nav.simulations') },
+    { path: '/discussions', icon: '💬', label: 'Discussions' },
     { path: '/xp-rewards', icon: '⚡', label: t('nav.xpRewards') },
+    { path: '/certificates', icon: '🎓', label: 'Certificates' },
     { path: '/analytics', icon: '📊', label: t('nav.analytics') },
     { path: '/leaderboard', icon: '🏆', label: t('nav.leaderboard') },
     { path: '/learning-style', icon: '🧠', label: t('nav.learningStyle') },
@@ -37,12 +58,17 @@ export default function Layout() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <div className="logo-container" style={{ width: 60, height: 48, borderRadius: 8 }}>
-            <img src="/BRAND_ICON_TRANSPARENT.png" alt="EduAI" className="logo-animated" />
+            <img src="/favicon_final.png" alt="EduAI" className="logo-animated" />
           </div>
           <span style={{ fontWeight: 950, fontSize: 12, letterSpacing: '0.15em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EDU AI</span>
         </div>
         </div>
-        <div className="badge badge-gold" style={{ fontSize: 11 }}>⚡ {user?.xp || 0}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button className="btn btn-ghost btn-sm" onClick={toggleTheme} style={{ fontSize: 16, padding: 4 }}>
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
+          <div className="badge badge-gold" style={{ fontSize: 11 }}>⚡ {user?.xp || 0}</div>
+        </div>
       </div>
 
       {/* Sidebar Overlay */}
@@ -50,11 +76,14 @@ export default function Layout() {
 
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
-        <div className="sidebar-logo" style={{ borderBottom: 'none', marginBottom: 20 }}>
-           <div className="logo-container" style={{ width: 110, height: 88 }}>
-             <img src="/BRAND_ICON_TRANSPARENT.png" alt="EDU AI" className="logo-animated" />
+        <div className="sidebar-logo" style={{ borderBottom: 'none', marginBottom: 12 }}>
+           <div className="logo-container" style={{ width: 90, height: 72 }}>
+             <img src="/favicon_final.png" alt="EDU AI" className="logo-animated" />
            </div>
-           <h1 style={{ fontSize: 20, fontWeight: 950, letterSpacing: '0.2em', marginTop: 10, background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EDU AI</h1>
+           <h1 style={{ fontSize: 18, fontWeight: 950, letterSpacing: '0.2em', marginTop: 8, background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EDU AI</h1>
+           <button className="btn btn-ghost btn-sm" onClick={toggleTheme} style={{ position: 'absolute', top: 12, right: 12, fontSize: 16, padding: 4 }}>
+             {theme === 'dark' ? '☀️' : '🌙'}
+           </button>
         </div>
         <nav className="sidebar-nav">
           {navItems.map(item => (
@@ -93,4 +122,3 @@ export default function Layout() {
     </div>
   );
 }
-

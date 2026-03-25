@@ -69,9 +69,13 @@ export default function TestPage() {
 
   const startExam = async () => {
     try {
-      // Enter Fullscreen
-      if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
+      // Enter Fullscreen (Catch non-user gesture or permission errors)
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (fsErr) {
+        console.warn('Fullscreen request failed:', fsErr);
       }
       setPhase('loading');
 
@@ -117,7 +121,8 @@ export default function TestPage() {
       const res = await API.post('/submit-test', {
         subject,
         answers: finalAnswers,
-        timePerQuestion: timePerQuestionRef.current
+        timePerQuestion: timePerQuestionRef.current,
+        questions: questions // ADDED: Send questions back for AI verification
       });
       navigate('/results', { state: { results: res.data, subject } });
     } catch (err) {

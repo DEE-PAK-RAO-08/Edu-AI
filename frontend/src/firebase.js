@@ -19,4 +19,33 @@ const app = initializeApp(firebaseConfig);
 const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 const auth = getAuth(app);
 
-export { app, auth, analytics };
+let messaging = null;
+
+// Initialize Firebase Messaging only if supported and running in browser
+if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+  import('firebase/messaging').then(({ getMessaging }) => {
+    try {
+      messaging = getMessaging(app);
+    } catch (err) {
+      console.warn('Firebase Messaging not supported in this environment.', err);
+    }
+  });
+}
+
+export const requestFCMToken = async () => {
+  if (!messaging) return null;
+  try {
+    const { getToken } = await import('firebase/messaging');
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      // Typically requires a vapidKey. Without it, the default senderID might suffice, but it is recommended.
+      const token = await getToken(messaging);
+      return token;
+    }
+  } catch (error) {
+    console.error('An error occurred while retrieving token. ', error);
+  }
+  return null;
+};
+
+export { app, auth, analytics, messaging };

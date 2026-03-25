@@ -60,7 +60,7 @@ export default function LoginPage() {
           <div className="auth-header">
             <div className="logo">
               <div className="logo-container" style={{ width: 140, height: 112, borderRadius: 20 }}>
-                <img src="/BRAND_ICON_TRANSPARENT.png" alt="EduAI" className="logo-animated" />
+                <img src="/favicon_final.png" alt="EduAI" className="logo-animated" />
               </div>
             </div>
             <h1>Welcome back!</h1>

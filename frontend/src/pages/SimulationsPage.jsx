@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // ============================================
 // PROJECTILE MOTION SIMULATOR
@@ -969,6 +970,548 @@ function PendulumSimulator() {
 }
 
 // ============================================
+// OPTICS: PRISM REFRACTION (NEW)
+// ============================================
+function OpticsSimulator() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const [angle, setAngle] = useState(0);
+  const [wavelength, setWavelength] = useState(500); // 400nm - 700nm
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Prism (Triangle)
+    const prismSize = 150;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy - prismSize);
+    ctx.lineTo(cx - prismSize, cy + prismSize);
+    ctx.lineTo(cx + prismSize, cy + prismSize);
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fill();
+
+    // Incident Beam
+    const incidentAngle = (angle * Math.PI) / 180;
+    const beamStartX = 50;
+    const beamStartY = cy + 50;
+    
+    // Intersection with left side of prism
+    // Prism left edge line: y = mx + b
+    // Simple enough for simulation purposes, we'll draw to a fixed point on the prism
+    const hitX = cx - 75;
+    const hitY = cy + 50;
+
+    ctx.beginPath();
+    ctx.moveTo(beamStartX, beamStartY);
+    ctx.lineTo(hitX, hitY);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([10, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dispersion (Rainbow)
+    const colors = [
+      { nm: 400, color: '#9b59b6', offset: 0 },   // Violet
+      { nm: 450, color: '#3498db', offset: 5 },   // Blue
+      { nm: 500, color: '#2ecc71', offset: 10 },  // Green
+      { nm: 580, color: '#f1c40f', offset: 15 },  // Yellow
+      { nm: 620, color: '#e67e22', offset: 20 },  // Orange
+      { nm: 700, color: '#e74c3c', offset: 25 },  // Red
+    ];
+
+    colors.forEach(c => {
+      ctx.beginPath();
+      ctx.moveTo(hitX, hitY);
+      const exitX = cx + 75;
+      const exitY = cy + 50 + c.offset;
+      ctx.lineTo(exitX, exitY);
+      ctx.lineTo(canvas.width - 50, exitY + (exitY - hitY));
+      ctx.strokeStyle = c.color;
+      ctx.globalAlpha = 0.6;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+
+    animRef.current = requestAnimationFrame(draw);
+  }, [angle]);
+
+  useEffect(() => {
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [draw]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🌈 Light Refraction (Prism)</h3>
+      <div className="sim-controls">
+        <label>Light Angle: {angle}°</label>
+        <input type="range" className="sim-slider" min="-30" max="30" value={angle} onChange={e => setAngle(+e.target.value)} />
+      </div>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={400} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Observe how white light splits into its component colors when passing through a triangular prism due to dispersion.
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// WAVE INTERFERENCE SIMULATOR (NEW)
+// ============================================
+function WaveInterference() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const [freq, setFreq] = useState(0.05);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const time = Date.now() * 0.005;
+
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+
+    const s1 = { x: width * 0.3, y: height * 0.5 };
+    const s2 = { x: width * 0.7, y: height * 0.5 };
+
+    for (let y = 0; y < height; y += 2) {
+      for (let x = 0; x < width; x += 2) {
+        const d1 = Math.sqrt((x - s1.x)**2 + (y - s1.y)**2);
+        const d2 = Math.sqrt((x - s2.x)**2 + (y - s2.y)**2);
+        
+        const v1 = Math.sin(d1 * freq - time);
+        const v2 = Math.sin(d2 * freq - time);
+        const amp = (v1 + v2) / 2;
+        
+        const brightness = (amp + 1) * 127;
+        const baseIdx = (y * width + x) * 4;
+        
+        // Draw 2x2 blocks for performance
+        for(let i=0; i<2; i++) {
+          for(let j=0; j<2; j++) {
+            const idx = ((y+i) * width + (x+j)) * 4;
+            data[idx] = brightness * 0.5;   // R
+            data[idx+1] = brightness * 0.8; // G
+            data[idx+2] = brightness;       // B
+            data[idx+3] = 255;              // A
+          }
+        }
+      }
+    }
+    ctx.putImageData(imageData, 0, 0);
+
+    // Sources
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(s1.x, s1.y, 4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(s2.x, s2.y, 4, 0, Math.PI*2); ctx.fill();
+
+    animRef.current = requestAnimationFrame(draw);
+  }, [freq]);
+
+  useEffect(() => {
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [draw]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🌊 Wave Interference</h3>
+      <div className="sim-controls">
+        <label>Frequency: {freq.toFixed(3)}</label>
+        <input type="range" className="sim-slider" min="0.02" max="0.15" step="0.005" value={freq} onChange={e => setFreq(+e.target.value)} />
+      </div>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={400} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Observe constructive and destructive interference patterns between two point sources.
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// GRAVITY WELL SIMULATOR (NEW)
+// ============================================
+function GravityWell() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const [mass, setMass] = useState(50);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const cx = width / 2;
+    const cy = height / 2;
+
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(0, 0, width, height);
+
+    // Grid Warp
+    ctx.strokeStyle = 'rgba(108, 92, 231, 0.2)';
+    ctx.lineWidth = 1;
+    const gridSize = 40;
+
+    for (let x = 0; x <= width; x += gridSize) {
+      ctx.beginPath();
+      for (let y = 0; y <= height; y += 5) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const force = (mass * 1000) / (dist + 50);
+        const angle = Math.atan2(dy, dx);
+        
+        const px = x - Math.cos(angle) * force;
+        const py = y - Math.sin(angle) * force;
+        
+        if (y === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    for (let y = 0; y <= height; y += gridSize) {
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += 5) {
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const force = (mass * 1000) / (dist + 50);
+        const angle = Math.atan2(dy, dx);
+        
+        const px = x - Math.cos(angle) * force;
+        const py = y - Math.sin(angle) * force;
+        
+        if (x === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    // Singularity / Star
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, mass);
+    grd.addColorStop(0, '#fff');
+    grd.addColorStop(0.2, '#6c5ce7');
+    grd.addColorStop(1, 'transparent');
+    ctx.fillStyle = grd;
+    ctx.beginPath();
+    ctx.arc(cx, cy, mass, 0, Math.PI * 2);
+    ctx.fill();
+
+    animRef.current = requestAnimationFrame(draw);
+  }, [mass]);
+
+  useEffect(() => {
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [draw]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🕳️ Spacetime Curvature (Gravity Well)</h3>
+      <div className="sim-controls">
+        <label>Mass: {mass}</label>
+        <input type="range" className="sim-slider" min="10" max="100" value={mass} onChange={e => setMass(+e.target.value)} />
+      </div>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={500} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Visualize how mass warps the fabric of spacetime, creating what we perceive as gravity.
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// ELECTRIC FIELD SIMULATOR (NEW)
+// ============================================
+function ElectricFieldSimulator() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+  const [chargeType, setChargeType] = useState('dipole'); // dipole, same, single
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, width, height);
+
+    const charges = [];
+    if (chargeType === 'dipole') {
+      charges.push({ x: width * 0.35, y: height * 0.5, q: 1 });
+      charges.push({ x: width * 0.65, y: height * 0.5, q: -1 });
+    } else if (chargeType === 'same') {
+      charges.push({ x: width * 0.35, y: height * 0.5, q: 1 });
+      charges.push({ x: width * 0.65, y: height * 0.5, q: 1 });
+    } else {
+      charges.push({ x: width * 0.5, y: height * 0.5, q: 1 });
+    }
+
+    // Draw field lines using particles
+    ctx.strokeStyle = 'rgba(52, 152, 219, 0.3)';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i < 20; i++) {
+        charges.forEach(c => {
+            if(c.q < 0) return; // Lines start from positive
+            for(let a=0; a<Math.PI*2; a+=Math.PI/8) {
+                let px = c.x + Math.cos(a) * 10;
+                let py = c.y + Math.sin(a) * 10;
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                
+                for(let step=0; step<100; step++) {
+                    let fx = 0, fy = 0;
+                    charges.forEach(oc => {
+                        const dx = px - oc.x;
+                        const dy = py - oc.y;
+                        const d2 = dx*dx + dy*dy;
+                        const f = oc.q / (d2 + 100);
+                        fx += (dx / Math.sqrt(d2)) * f;
+                        fy += (dy / Math.sqrt(d2)) * f;
+                    });
+                    
+                    const mag = Math.sqrt(fx*fx + fy*fy);
+                    px += (fx/mag) * 5;
+                    py += (fy/mag) * 5;
+                    ctx.lineTo(px, py);
+                    
+                    if(px < 0 || px > width || py < 0 || py > height) break;
+                    // Check if hit a negative charge
+                    let hit = false;
+                    charges.forEach(oc => {
+                        if(oc.q < 0 && Math.sqrt((px-oc.x)**2 + (py-oc.y)**2) < 10) hit = true;
+                    });
+                    if(hit) break;
+                }
+                ctx.stroke();
+            }
+        });
+    }
+
+    // Draw charges
+    charges.forEach(c => {
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, 12, 0, Math.PI * 2);
+      ctx.fillStyle = c.q > 0 ? '#e74c3c' : '#3498db';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(c.q > 0 ? '+' : '-', c.x, c.y);
+    });
+
+  }, [chargeType]);
+
+  useEffect(() => {
+    draw();
+  }, [draw]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>⚡ Electric Field Lines</h3>
+      <div className="sim-controls">
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button className={`btn btn-sm ${chargeType === 'dipole' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setChargeType('dipole')}>Dipole (+ & -)</button>
+          <button className={`btn btn-sm ${chargeType === 'same' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setChargeType('same')}>Same (+ & +)</button>
+          <button className={`btn btn-sm ${chargeType === 'single' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setChargeType('single')}>Single Point (+)</button>
+        </div>
+      </div>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={450} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Visualize electric field lines between different configurations of point charges.
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// DNA HELIX EXPLORER (NEW)
+// ============================================
+function DNAExplorer() {
+  const canvasRef = useRef(null);
+  const animRef = useRef(null);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const time = Date.now() * 0.002;
+
+    ctx.fillStyle = '#0b0f19';
+    ctx.fillRect(0, 0, width, height);
+
+    const nodes = 20;
+    const spacing = height / nodes;
+    const amplitude = 80;
+
+    for (let i = 0; i < nodes; i++) {
+        const y = i * spacing + spacing/2;
+        const angle = i * 0.5 + time;
+        
+        const x1 = width/2 + Math.sin(angle) * amplitude;
+        const x2 = width/2 + Math.sin(angle + Math.PI) * amplitude;
+        
+        // Connecting ladder
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Helix 1
+        ctx.beginPath();
+        ctx.arc(x1, y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#3498db';
+        ctx.fill();
+        
+        // Helix 2
+        ctx.beginPath();
+        ctx.arc(x2, y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#e74c3c';
+        ctx.fill();
+        
+        // Base pairs indicator
+        ctx.fillStyle = '#fff';
+        ctx.font = '8px Arial';
+        ctx.fillText(i % 2 === 0 ? 'A-T' : 'G-C', width/2 - 10, y + 3);
+    }
+
+    animRef.current = requestAnimationFrame(draw);
+  }, []);
+
+  useEffect(() => {
+    animRef.current = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [draw]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🧬 DNA Double Helix Explorer</h3>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={600} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Visualize the molecular structure of DNA, including the sugar-phosphate backbone and nitrogenous base pairs (Adenine-Thymine, Guanine-Cytosine).
+      </p>
+    </div>
+  );
+}
+
+// ============================================
+// CIRCUIT LAB / OHM'S LAW (NEW)
+// ============================================
+function CircuitLab() {
+  const canvasRef = useRef(null);
+  const [voltage, setVoltage] = useState(9);
+  const [resistance, setResistance] = useState(10); // Ohms
+
+  const current = (voltage / resistance).toFixed(2);
+  const brightness = Math.min(100, (voltage / resistance) * 50);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 4;
+      
+      // Box
+      ctx.strokeRect(w*0.2, h*0.2, w*0.6, h*0.6);
+      
+      // Battery
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(w*0.18, h*0.4, 40, 100);
+      ctx.strokeRect(w*0.18, h*0.4, 40, 100);
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 20px Arial';
+      ctx.fillText('+', w*0.2, h*0.45);
+      ctx.fillText('-', w*0.2, h*0.65);
+      ctx.fillText(`${voltage}V`, w*0.12, h*0.52);
+
+      // Bulb
+      const bx = w*0.8;
+      const by = h*0.5;
+      ctx.beginPath();
+      ctx.arc(bx, by, 40, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(241, 196, 15, ${brightness/100})`;
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.fillText('💡', bx-15, by+10);
+      
+      // Ammeter
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(w*0.4, h*0.15, 120, 40);
+      ctx.strokeRect(w*0.4, h*0.15, 120, 40);
+      ctx.fillStyle = '#2ecc71';
+      ctx.font = '16px monospace';
+      ctx.fillText(`${current} Amps`, w*0.42, h*0.2);
+
+  }, [voltage, resistance, brightness, current]);
+
+  return (
+    <div>
+      <h3 style={{ fontWeight: 700, marginBottom: 16 }}>🔌 Basic Circuit Lab (Ohm's Law)</h3>
+      <div className="sim-controls">
+        <div className="sim-slider-group">
+          <label>Voltage: {voltage}V</label>
+          <input type="range" className="sim-slider" min="1" max="24" value={voltage} onChange={e => setVoltage(+e.target.value)} />
+        </div>
+        <div className="sim-slider-group">
+          <label>Resistance: {resistance} Ω</label>
+          <input type="range" className="sim-slider" min="1" max="100" value={resistance} onChange={e => setResistance(+e.target.value)} />
+        </div>
+      </div>
+      <div className="sim-canvas-wrapper" style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <canvas ref={canvasRef} width={800} height={400} />
+      </div>
+      <p style={{ marginTop: 16, color: 'var(--text-secondary)', fontSize: 13, textAlign: 'center' }}>
+        Experiment with Ohm's Law (V = I × R). Change the voltage and resistance to see how it affects the current and bulb brightness.
+      </p>
+    </div>
+  );
+}
+
+// ============================================
 // MAIN SIMULATIONS PAGE
 // ============================================
 export default function SimulationsPage() {
@@ -976,33 +1519,115 @@ export default function SimulationsPage() {
   const { t } = useLanguage();
 
   const sims = [
-    { id: 'sorting', name: 'Algorithm Visualizer', icon: '🔢', description: 'Watch sorting algorithms interact with numbers visually.', subject: 'Computer Science' },
+    { id: 'sorting', name: 'Algorithm Visualizer', icon: '📊', description: 'Watch sorting algorithms interact with numbers visually.', subject: 'Computer Science' },
     { id: 'solar', name: 'Solar System Dynamics', icon: '🪐', description: 'Observe planetary orbits and relativistic speeds.', subject: 'Astronomy' },
-    { id: 'projectile', name: 'Projectile Motion', icon: '🚀', description: 'Simulate projectile paths with adjustable velocity & angle.', subject: 'Physics' },
-    { id: 'pendulum', name: 'Pendulum Waves', icon: '🌀', description: 'Explore kinetic chaos with multiple hanging pendulums.', subject: 'Physics' }
+    { id: 'dna', name: 'DNA Helix Explorer', icon: '🧬', description: 'Explore the 3D structure and base pairs of DNA.', subject: 'Biology' },
+    { id: 'projectile', name: 'Projectile Motion', icon: '🏹', description: 'Simulate projectile paths with adjustable velocity & angle.', subject: 'Physics' },
+    { id: 'circuit', name: 'Circuit Lab', icon: '🔌', description: 'Build circuits and test Ohm\'s Law in real-time.', subject: 'Physics' },
+    { id: 'pendulum', name: 'Pendulum Waves', icon: '🌀', description: 'Explore kinetic chaos with multiple hanging pendulums.', subject: 'Physics' },
+    { id: 'optics', name: 'Optics: Prism', icon: '🌈', description: 'See how light refracts and disperses through a prism.', subject: 'Physics' },
+    { id: 'waves', name: 'Wave Interference', icon: '🌊', description: 'Observe interference patterns between two point sources.', subject: 'Physics' },
+    { id: 'gravity', name: 'Gravity Well', icon: '🕳️', description: 'Visualize how mass warps the fabric of spacetime.', subject: 'Physics' },
+    { id: 'electric', name: 'Electric Field', icon: '⚡', description: 'Visualize electric field lines between point charges.', subject: 'Physics' }
   ];
 
-  if (active === 'sorting') return <div className="animate-fade"><button className="btn btn-ghost btn-sm" onClick={() => setActive(null)} style={{ marginBottom: 16 }}>← Back to Simulations</button><div className="simulation-canvas"><SortingVisualizer /></div></div>;
-  if (active === 'solar') return <div className="animate-fade"><button className="btn btn-ghost btn-sm" onClick={() => setActive(null)} style={{ marginBottom: 16 }}>← Back to Simulations</button><div className="simulation-canvas"><SolarSystemSimulator /></div></div>;
-  if (active === 'projectile') return <div className="animate-fade"><button className="btn btn-ghost btn-sm" onClick={() => setActive(null)} style={{ marginBottom: 16 }}>← Back to Simulations</button><div className="simulation-canvas"><ProjectileSimulator /></div></div>;
-  if (active === 'pendulum') return <div className="animate-fade"><button className="btn btn-ghost btn-sm" onClick={() => setActive(null)} style={{ marginBottom: 16 }}>← Back to Simulations</button><div className="simulation-canvas"><PendulumSimulator /></div></div>;
+  const renderActiveSim = () => {
+    switch (active) {
+      case 'sorting': return <div className="simulation-canvas"><SortingVisualizer /></div>;
+      case 'solar': return <div className="simulation-canvas"><SolarSystemSimulator /></div>;
+      case 'dna': return <div className="simulation-canvas"><DNAExplorer /></div>;
+      case 'projectile': return <div className="simulation-canvas"><ProjectileSimulator /></div>;
+      case 'circuit': return <div className="simulation-canvas"><CircuitLab /></div>;
+      case 'pendulum': return <div className="simulation-canvas"><PendulumSimulator /></div>;
+      case 'optics': return <div className="simulation-canvas"><OpticsSimulator /></div>;
+      case 'waves': return <div className="simulation-canvas"><WaveInterference /></div>;
+      case 'gravity': return <div className="simulation-canvas"><GravityWell /></div>;
+      case 'electric': return <div className="simulation-canvas"><ElectricFieldSimulator /></div>;
+      default: return null;
+    }
+  };
 
   return (
     <div className="animate-fade">
-      <div className="page-header">
-        <h1>🔬 {t('simulations.title')}</h1>
-        <p>{t('simulations.subtitle')}</p>
-      </div>
-      <div className="grid-3 stagger-children">
-        {sims.map(sim => (
-          <div key={sim.id} className="game-card" onClick={() => setActive(sim.id)}>
-            <div className="game-icon" style={{ background: 'rgba(108, 92, 231, 0.15)' }}>{sim.icon}</div>
-            <h3>{sim.name}</h3>
-            <p>{sim.description}</p>
-            <span className="badge badge-primary">{sim.subject}</span>
-          </div>
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        {!active ? (
+          <motion.div 
+            key="list"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            <div className="page-header">
+              <h1>🔬 {t('simulations.title')}</h1>
+              <p>{t('simulations.subtitle')}</p>
+            </div>
+            <div className="grid-3" style={{ gap: '25px', padding: '10px' }}>
+              {sims.map((sim, idx) => (
+                <motion.div 
+                  key={sim.id} 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  whileHover={{ y: -8, scale: 1.02 }} 
+                  whileTap={{ scale: 0.98 }}
+                  className="game-card" 
+                  onClick={() => setActive(sim.id)}
+                  style={{
+                    background: 'rgba(30, 41, 59, 0.5)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '24px',
+                    padding: '24px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div style={{ 
+                    width: 64, 
+                    height: 64, 
+                    background: 'rgba(108, 92, 231, 0.15)', 
+                    borderRadius: 18, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    fontSize: 32, 
+                    marginBottom: 20 
+                  }}>
+                    {sim.icon}
+                  </div>
+                  <h3 style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 10 }}>{sim.name}</h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.5, marginBottom: 20, flexGrow: 1 }}>{sim.description}</p>
+                  <span className="badge badge-primary" style={{ alignSelf: 'flex-start', fontSize: 10 }}>{sim.subject}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="active"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            style={{ maxWidth: 850, margin: '0 auto' }}
+          >
+            <button 
+              className="btn btn-ghost btn-sm" 
+              onClick={() => setActive(null)} 
+              style={{ marginBottom: 16, fontWeight: 700 }}
+            >
+              ← BACK TO LABORATORY
+            </button>
+            <div className="card" style={{ padding: '30px', borderRadius: 24, background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(12px)' }}>
+              {renderActiveSim()}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
