@@ -24,17 +24,29 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('eduai_token');
     const savedUser = localStorage.getItem('eduai_user');
-    if (token && savedUser) {
-      setUser(JSON.parse(savedUser));
-      // Refresh profile
-      API.get('/profile').then(res => {
-        setUser(res.data);
-        localStorage.setItem('eduai_user', JSON.stringify(res.data));
-      }).catch(() => {
+    
+    if (token && savedUser && savedUser !== 'undefined') {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        
+        // Refresh profile from server
+        API.get('/profile').then(res => {
+          setUser(res.data);
+          localStorage.setItem('eduai_user', JSON.stringify(res.data));
+        }).catch(() => {
+          // If profile fetch fails, token might be invalid
+          localStorage.removeItem('eduai_token');
+          localStorage.removeItem('eduai_user');
+          setUser(null);
+        }).finally(() => setLoading(false));
+      } catch (err) {
+        console.error('Safe parsing error (AuthContext):', err);
         localStorage.removeItem('eduai_token');
         localStorage.removeItem('eduai_user');
         setUser(null);
-      }).finally(() => setLoading(false));
+        setLoading(false);
+      }
     } else {
       setLoading(false);
     }

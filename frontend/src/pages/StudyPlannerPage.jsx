@@ -8,8 +8,13 @@ export default function StudyPlannerPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(null);
   const [completedTasks, setCompletedTasks] = useState(() => {
-    const saved = localStorage.getItem('eduai_completed_tasks');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('eduai_completed_tasks');
+      if (saved && saved !== 'undefined') return JSON.parse(saved);
+    } catch (err) {
+      console.error('Safe parsing error (StudyPlanner):', err);
+    }
+    return {};
   });
 
   useEffect(() => {
