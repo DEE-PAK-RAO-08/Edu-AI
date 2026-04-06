@@ -42,7 +42,7 @@ export default function Dashboard() {
       <div className="welcome-card" style={{ marginBottom: 24 }}>
         <h2>{t('dashboard.welcomeBack')}, {user?.displayName || user?.username || 'Learner'}! 👋</h2>
         <p>{t('dashboard.readyContinue')}</p>
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <button className="btn btn-secondary" onClick={() => navigate('/subjects')}>
             📚 {t('dashboard.startLearning')}
           </button>

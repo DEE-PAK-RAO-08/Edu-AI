@@ -56,12 +56,10 @@ export default function Layout() {
       <div className="mobile-header">
         <button className="menu-btn" onClick={() => setSidebarOpen(true)}>☰</button>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
           <div className="logo-container" style={{ width: 60, height: 48, borderRadius: 8 }}>
             <img src="/favicon_final.png" alt="EduAI" className="logo-animated" />
           </div>
           <span style={{ fontWeight: 950, fontSize: 12, letterSpacing: '0.15em', background: 'var(--gradient-primary)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EDU AI</span>
-        </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button className="btn btn-ghost btn-sm" onClick={toggleTheme} style={{ fontSize: 16, padding: 4 }}>

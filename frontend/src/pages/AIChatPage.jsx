@@ -96,15 +96,7 @@ export default function AIChatPage() {
   const [showSubjectInput, setShowSubjectInput] = useState(false);
 
   return (
-    <div className="main-content-inner" style={{ 
-      height: 'calc(100vh - 120px)', 
-      display: 'flex', 
-      flexDirection: 'column', 
-      maxWidth: '1000px', // Rebalanced for readability & "Big" feel
-      margin: '0 auto', 
-      width: '100%',
-      padding: '0 20px'
-    }}>
+    <div className="ai-chat-container">
       <header style={{ marginBottom: 20, textAlign: 'center' }}>
         <h1 style={{ 
           fontSize: '1.6rem', // Slightly smaller for elegance

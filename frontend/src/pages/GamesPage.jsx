@@ -240,7 +240,7 @@ function LogicMazeGame({ onComplete }) {
             {questions[step].q}
           </div>
 
-          <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="options-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
             {questions[step].options.map((opt, i) => (
               <motion.button 
                 key={i} 
@@ -330,7 +330,7 @@ function FractionMatchGame({ onComplete }) {
         <span className="badge badge-gold">⚡ {score} XP</span>
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, maxWidth: 450, margin: '0 auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: 12, maxWidth: 450, margin: '0 auto' }}>
         {cards.map(card => {
           const isFlipped = flipped.find(f => f.id === card.id);
           const isMatched = matched.includes(card.id);
@@ -486,12 +486,12 @@ export default function GamesPage() {
 
   return (
     <div className="animate-fade">
-      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h1>🎮 {t('games.title')}</h1>
           <p>{t('games.subtitle')}</p>
         </div>
-        <select className="form-input" style={{ width: 150 }} value={ageFilter} onChange={e => setAgeFilter(e.target.value)}>
+        <select className="form-input" style={{ width: 150, flexShrink: 0 }} value={ageFilter} onChange={e => setAgeFilter(e.target.value)}>
           <option value="all">All Ages</option>
           <option value="children">Children (Kids)</option>
           <option value="adults">Teens & Adults</option>

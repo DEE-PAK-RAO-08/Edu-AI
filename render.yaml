@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: edu-ai-backend
+    runtime: docker
+    region: oregon
+    plan: free # or starter
+    rootDir: backend
+    healthCheckPath: /api/test-connection
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: MONGODB_URI
+        generateValue: false # Set in Render Dashboard
+      - key: JWT_SECRET
+        generateValue: true # Render will generate a random string
+      - key: GEMINI_API_KEY
+        generateValue: false # Set in Render Dashboard
+      - key: FRONTEND_URL
+        value: https://edu-ai-frontend.onrender.com # Update with actual live URL
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false

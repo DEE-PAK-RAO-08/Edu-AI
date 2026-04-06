@@ -42,17 +42,17 @@ export default function ResultsPage() {
         <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
           You answered {results.correct} out of {results.total} questions correctly
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--accent-gold)' }}>+{results.xpEarned}</div>
+            <div style={{ fontSize: 'clamp(18px, 4vw, 24px)', fontWeight: 700, color: 'var(--accent-gold)' }}>+{results.xpEarned}</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>XP Earned</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--accent-primary-light)' }}>Lv. {results.level}</div>
+            <div style={{ fontSize: 'clamp(18px, 4vw, 24px)', fontWeight: 700, color: 'var(--accent-primary-light)' }}>Lv. {results.level}</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{results.levelTitle}</div>
           </div>
           <div>
-            <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--accent-secondary)' }}>{results.avgResponseTime}s</div>
+            <div style={{ fontSize: 'clamp(18px, 4vw, 24px)', fontWeight: 700, color: 'var(--accent-secondary)' }}>{results.avgResponseTime}s</div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Avg. Time</div>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function ResultsPage() {
       )}
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+      <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button className="btn btn-primary" onClick={() => navigate(`/learning/${subject}`)}>
           Start Learning Path →
         </button>

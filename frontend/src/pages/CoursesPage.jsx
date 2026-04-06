@@ -178,7 +178,7 @@ export default function CoursesPage() {
           </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
             <div style={{ fontSize: 32 }}>{activeCurriculum.find(s => s.id === selectedSubject)?.icon}</div>
-            <h2 style={{ fontSize: 32, fontWeight: 900 }}>{selectedSubject.replace('-', ' ').toUpperCase()} Topics</h2>
+            <h2 style={{ fontSize: 'clamp(20px, 5vw, 32px)', fontWeight: 900 }}>{selectedSubject.replace('-', ' ').toUpperCase()} Topics</h2>
           </div>
           <div className="grid-3 stagger-children">
             {curriculum[selectedSubject].map(topic => (
@@ -202,7 +202,7 @@ export default function CoursesPage() {
           </button>
 
           <div className="card" style={{ padding: 0, overflow: 'hidden', marginBottom: 32, boxShadow: 'var(--shadow-lg)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ padding: '24px 32px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ padding: '24px 32px', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <h2 style={{ fontSize: 28, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{courseData.title}</h2>
                 {courseData.isPlaceholder && <span className="badge badge-warning" style={{ fontSize: 12 }}>🚧 Content Finalizing</span>}

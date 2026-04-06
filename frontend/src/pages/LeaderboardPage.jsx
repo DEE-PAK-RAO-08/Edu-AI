@@ -35,8 +35,8 @@ export default function LeaderboardPage() {
   return (
     <div className="animate-fade leaderboard-page" style={{ maxWidth: 1000, margin: '0 auto' }}>
       <div className="page-header" style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h1 style={{ fontSize: 40, fontWeight: 900, marginBottom: 8 }}>{t('leaderboard.title')}</h1>
-        <p style={{ fontSize: 18, opacity: 0.8 }}>{t('leaderboard.subtitle')}</p>
+        <h1 style={{ fontSize: 'clamp(24px, 5vw, 40px)', fontWeight: 900, marginBottom: 8 }}>{t('leaderboard.title')}</h1>
+        <p style={{ fontSize: 'clamp(14px, 2.5vw, 18px)', opacity: 0.8 }}>{t('leaderboard.subtitle')}</p>
       </div>
 
       {/* Top 3 Podium Overhaul */}
@@ -87,16 +87,17 @@ export default function LeaderboardPage() {
       )}
 
       {/* Full Leaderboard Table */}
+      <div className="leaderboard-scroll-wrapper">
       <div className="card" style={{ padding: 0, overflow: 'hidden', border: 'none', background: 'transparent' }}>
-        <table className="leaderboard-table" style={{ borderSpacing: '0 12px' }}>
+        <table className="leaderboard-table" style={{ borderSpacing: '0 8px', width: '100%', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: 'transparent' }}>
-              <th style={{ paddingLeft: 24 }}>RANK</th>
+              <th style={{ paddingLeft: 16 }}>RANK</th>
               <th>PLAYER</th>
               <th>LEVEL</th>
-              <th>XP</th>
-              <th>BADGES</th>
-              <th style={{ paddingRight: 24 }}>STREAK</th>
+              <th style={{ paddingRight: 16 }}>XP</th>
+              <th className="hide-on-mobile">BADGES</th>
+              <th className="hide-on-mobile" style={{ paddingRight: 24 }}>STREAK</th>
             </tr>
           </thead>
           <tbody>
@@ -110,19 +111,19 @@ export default function LeaderboardPage() {
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  className={isMe ? 'table-row-me' : ''}
+                  className={`${isMe ? 'table-row-me' : ''} ${rank <= 3 ? 'hide-on-mobile' : ''}`}
                   style={{ background: 'var(--bg-card)', transition: 'transform 0.2s', cursor: 'default' }}
                 >
-                  <td style={{ paddingLeft: 24 }}>
+                  <td style={{ paddingLeft: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                       <span className={`rank-badge sm ${rank <= 3 ? `rank-${rank}` : ''}`} style={{ fontWeight: 800 }}>
                         {rank <= 3 ? getRankEmoji(rank) : rank}
                       </span>
                     </div>
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                      <div className="profile-avatar" style={{ width: 44, height: 44, fontSize: 18, overflow: 'hidden', border: '2px solid var(--border-color)' }}>
+                  <td style={{ padding: '12px 0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <div className="profile-avatar" style={{ width: 40, height: 40, fontSize: 16, overflow: 'hidden', border: '2px solid var(--border-color)' }}>
                         {player.profilePicture ? (
                           <img src={player.profilePicture} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
@@ -132,7 +133,7 @@ export default function LeaderboardPage() {
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>
                           {player.displayName} 
-                          {isMe && <span className="badge badge-primary" style={{ marginLeft: 8, fontSize: 10, padding: '2px 8px' }}>{t('leaderboard.you')}</span>}
+                          {isMe && <span className="badge badge-primary" style={{ marginLeft: 8, fontSize: 10, padding: '2px 6px' }}>{t('leaderboard.you')}</span>}
                         </div>
                         <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>@{player.username}</div>
                       </div>
@@ -145,12 +146,12 @@ export default function LeaderboardPage() {
                   <td>
                     <div style={{ fontWeight: 800, color: 'var(--accent-gold)', fontSize: 16 }}>{player.xp.toLocaleString()}</div>
                   </td>
-                  <td>
+                  <td className="hide-on-mobile">
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}>
                       {player.badges} <span style={{ opacity: 0.7 }}>🏅</span>
                     </div>
                   </td>
-                  <td style={{ paddingRight: 24 }}>
+                  <td className="hide-on-mobile" style={{ paddingRight: 24 }}>
                     {player.streak > 0 ? (
                       <span className="streak-display" style={{ display: 'inline-flex', padding: '4px 12px', borderRadius: 20 }}>
                         <span className="flame" style={{ marginRight: 6 }}>🔥</span>
@@ -171,6 +172,7 @@ export default function LeaderboardPage() {
             <p style={{ opacity: 0.7 }}>{t('leaderboard.beTheFirst')}</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   );
