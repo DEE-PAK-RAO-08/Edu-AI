@@ -29,8 +29,17 @@ const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 app.use(cors({
   origin: [FRONTEND_URL, 'http://127.0.0.1:5173', 'http://localhost:5173'],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
+
+// Cross-Origin-Opener-Policy (COOP) header for Firebase Auth popups
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); // Optional but recommended
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api', apiLimiter);
@@ -38,7 +47,9 @@ app.use('/api', apiLimiter);
 // ============================================
 // DATABASE CONNECTION
 // ============================================
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/edu_ai')
+// Check for Railway's MONGO_URL first, then fallbacks
+const mongoUri = process.env.MONGO_URL || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/edu_ai';
+mongoose.connect(mongoUri)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
