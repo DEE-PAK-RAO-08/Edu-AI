@@ -14,11 +14,11 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Install a simple static file server
-RUN npm install -g serve
+# Install a production Express server
+RUN npm install express
 
-# Expose port
+# Expose the port
 EXPOSE 5173
 
-# Start the application
-CMD ["serve", "-s", "dist", "-l", "5173"]
+# Start the application using server.js
+CMD ["node", "server.js"]

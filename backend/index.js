@@ -36,7 +36,6 @@ app.use(cors({
 // Cross-Origin-Opener-Policy (COOP) header for Firebase Auth popups
 app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp'); // Optional but recommended
   next();
 });
 
