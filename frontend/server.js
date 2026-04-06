@@ -16,8 +16,8 @@ app.use((req, res, next) => {
 // Serve static files from the 'dist' directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle React Routing
-app.get('*', (req, res) => {
+// Handle React Routing (Express 5 compatible catch-all)
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
