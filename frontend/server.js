@@ -22,6 +22,10 @@ app.get(/(.*)/, (req, res) => {
 });
 
 const PORT = process.env.PORT || 5173;
-app.listen(PORT, () => {
-  console.log(`🚀 Production Frontend Server running on port ${PORT}`);
+const DIST_PATH = path.join(__dirname, 'dist');
+
+console.log(`📂 Serving static files from: ${DIST_PATH}`);
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Production Frontend Server ready on port ${PORT}`);
 });

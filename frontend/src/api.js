@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api' });
+const apiUrl = import.meta.env.VITE_API_URL || 'https://edu-ai-backend-production-af44.up.railway.app/api';
+console.log('🔗 Connecting to API:', apiUrl);
+
+const API = axios.create({ baseURL: apiUrl });
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('eduai_token');

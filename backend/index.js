@@ -33,6 +33,11 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
+// Final health check route
+app.get('/', (req, res) => {
+  res.json({ status: 'Edu-AI API is Online', timestamp: new Date() });
+});
+
 // Cross-Origin-Opener-Policy (COOP) header for Firebase Auth popups
 app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
